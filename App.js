@@ -1,35 +1,62 @@
-import { StyleSheet, Text, View, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  ScrollView,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import "react-native-get-random-values";
+import Header from "./components/Header";
+import TodoItem from "./components/TodoItem";
+import AddTodo from "./components/AddTodo";
 
 export default function App() {
-  const [name, setName] = useState("Felix");
-  const [age, setAge] = useState(34);
+  const [todos, setTodos] = useState([
+    { text: "Buy a coffe", id: uuidv4() },
+    { text: "Create a app", id: uuidv4() },
+    { text: "Play on ps5", id: uuidv4() },
+  ]);
 
-  const updateName = (enteredValue) => {
-    setName(enteredValue);
+  const testId = (id) => {
+    console.log(id);
   };
 
-  const updateAge = (enteredValue) => {
-    setAge(enteredValue);
+  const handleDelete = (id) => (e) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter((item) => item.id !== id);
+    });
+  };
+
+  const handleAddTodo = (enteredTodo) => {
+    if (enteredTodo.length > 3) {
+      setTodos((prevTodos) => {
+        return [{ text: enteredTodo, id: uuidv4() }, ...prevTodos];
+      });
+    } else {
+      Alert.alert("Must enter al least 3 characters", {});
+    }
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="name"
-          onChangeText={updateName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="age"
-          onChangeText={updateAge}
-        />
+      <Header />
+      <View style={styles.content}>
+        <AddTodo addTodo={handleAddTodo} />
+        <View style={styles.list}>
+          <FlatList
+            data={todos}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TodoItem item={item.text} pressHandler={handleDelete(item.id)} />
+            )}
+          />
+        </View>
       </View>
-      <Text>
-        name: {name}, age:{age}
-      </Text>
     </View>
   );
 }
@@ -38,20 +65,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    // alignItems: "center",
+    // justifyContent: "center",
   },
-  input: {
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "black",
-    width: "50%",
-    height: 30,
+  content: {
+    padding: 40,
   },
-  inputContainer: {
-    width: 300,
-    height: "15%",
-    justifyContent: "space-around",
-    alignItems: "center",
+  list: {
+    marginTop: 20,
   },
 });
