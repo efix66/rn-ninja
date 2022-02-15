@@ -1,12 +1,10 @@
 import {
   StyleSheet,
-  Text,
   View,
-  TextInput,
-  ScrollView,
   FlatList,
-  TouchableOpacity,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -14,6 +12,7 @@ import "react-native-get-random-values";
 import Header from "./components/Header";
 import TodoItem from "./components/TodoItem";
 import AddTodo from "./components/AddTodo";
+import SandBox from "./components/SandBox";
 
 export default function App() {
   const [todos, setTodos] = useState([
@@ -38,26 +37,38 @@ export default function App() {
         return [{ text: enteredTodo, id: uuidv4() }, ...prevTodos];
       });
     } else {
-      Alert.alert("Must enter al least 3 characters", {});
+      Alert.alert("OOPS", "Todos must be over 3 chars long", [
+        { text: "Understood", onPress: () => console.log("alert closed") },
+      ]);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Header />
-      <View style={styles.content}>
-        <AddTodo addTodo={handleAddTodo} />
-        <View style={styles.list}>
-          <FlatList
-            data={todos}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TodoItem item={item.text} pressHandler={handleDelete(item.id)} />
-            )}
-          />
+    //<SandBox>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}>
+      <View style={styles.container}>
+        <Header />
+        <View style={styles.content}>
+          <AddTodo addTodo={handleAddTodo} />
+          <View style={styles.list}>
+            <FlatList
+              data={todos}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TodoItem
+                  item={item.text}
+                  pressHandler={handleDelete(item.id)}
+                />
+              )}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
+    //</SandBox>
   );
 }
 
@@ -65,13 +76,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    // alignItems: "center",
-    // justifyContent: "center",
   },
   content: {
     padding: 40,
+    flex: 1,
   },
   list: {
+    flex: 1,
     marginTop: 20,
   },
 });
